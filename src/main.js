@@ -95,14 +95,26 @@ function attachSidebarEvents(navigate) {
 function toggleSidebar(forceClose = false) {
   const sidebar = document.querySelector('.premium-sidebar');
   const overlay = document.getElementById('sidebar-overlay');
-  if (!sidebar || !overlay) return;
+  
+  if (!sidebar || !overlay) {
+    console.warn('Sidebar or overlay not found');
+    return;
+  }
 
   if (forceClose) {
     sidebar.classList.remove('active');
     overlay.classList.remove('active');
+    document.body.style.overflow = ''; // Kaydırmayı geri aç
   } else {
-    sidebar.classList.toggle('active');
+    const isActive = sidebar.classList.toggle('active');
     overlay.classList.toggle('active');
+    
+    // Menü açıkken arka plan kaydırmasını engelle
+    if (isActive) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
   }
 }
 
@@ -161,10 +173,29 @@ async function navigate(page) {
     e.preventDefault();
     navigate('dashboard');
   });
-
-  document.getElementById('menu-toggle')?.addEventListener('click', () => toggleSidebar());
-  document.getElementById('sidebar-overlay')?.addEventListener('click', () => toggleSidebar(true));
 }
+
+// Global Statik Listenerlar (Event Delegation ile daha sağlam)
+const handleMenuClick = (e) => {
+  const toggleBtn = e.target.closest('#menu-toggle');
+  const overlay = e.target.closest('#sidebar-overlay');
+  
+  if (toggleBtn) {
+    e.preventDefault();
+    toggleSidebar();
+  } else if (overlay) {
+    toggleSidebar(true);
+  }
+};
+
+document.addEventListener('click', handleMenuClick);
+document.addEventListener('touchstart', (e) => {
+  if (e.target.closest('#menu-toggle') || e.target.closest('#sidebar-overlay')) {
+    // touchstart bazen click'ten önce tetiklenir, 
+    // ama event delegation kullandığımız için click yeterli olacaktır.
+    // Bazı mobil tarayıcılarda tepki süresini artırmak için burayı opsiyonel bırakıyoruz.
+  }
+}, { passive: true });
 
 const firma = getCurrentFirma();
 navigate(firma ? 'dashboard' : 'login');
