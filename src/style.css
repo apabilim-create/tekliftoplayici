@@ -177,28 +177,51 @@ body {
 }
 
 .sidebar-category-label {
-  font-size: 0.65rem;
-  font-weight: 700;
-  color: #94a3b8;
+  font-size: 0.7rem;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 2px;
-  margin-bottom: 12px;
-  padding-left: 14px;
+  letter-spacing: 1.5px;
+  margin-bottom: 16px;
+  padding-left: 8px;
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.sidebar-category-label::after {
-  content: '';
-  height: 1px;
-  flex: 1;
-  background: linear-gradient(to right, rgba(0,0,0,0.06), transparent);
+.sidebar-main-nav {
+  padding: 0 12px;
+  margin-bottom: 24px;
 }
 
 .sidebar-section {
-  margin-bottom: 32px;
+  margin-bottom: 24px;
+  border-radius: 16px;
+  padding: 16px 12px;
+  border: 1px solid transparent;
+  transition: all 0.3s ease;
 }
+
+.section-account {
+  background: #f8fafc;
+  border-color: #f1f5f9;
+}
+.section-account .sidebar-category-label { color: #64748b; }
+
+.section-operations {
+  background: #f0f7ff;
+  border-color: #e0f2fe;
+}
+.section-operations .sidebar-category-label { color: #3b82f6; }
+.section-operations .nav-item:hover { background: #e0f2fe; color: #1e40af; }
+.section-operations .nav-item.active { background: #3b82f6; color: #ffffff; box-shadow: 0 8px 16px -4px rgba(59, 130, 246, 0.4); }
+
+.section-archive {
+  background: #f0fdf4;
+  border-color: #dcfce7;
+}
+.section-archive .sidebar-category-label { color: #22c55e; }
+.section-archive .nav-item:hover { background: #dcfce7; color: #166534; }
+.section-archive .nav-item.active { background: #22c55e; color: #ffffff; box-shadow: 0 8px 16px -4px rgba(34, 197, 94, 0.4); }
 
 /* Nav Item Styling */
 .sidebar-nav {
@@ -250,15 +273,16 @@ body {
   align-items: center;
   gap: 12px;
   padding: 14px;
-  background: #f8fafc;
-  border: 1px solid rgba(0,0,0,0.04);
+  background: #ffffff;
+  border: 1px solid rgba(0,0,0,0.06);
   border-radius: 16px;
   cursor: pointer;
   transition: all 0.3s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
 }
 
 .sidebar-profile-card:hover {
-  background: #f1f5f9;
+  background: #ffffff;
   border-color: rgba(59, 130, 246, 0.2);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
