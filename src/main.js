@@ -86,9 +86,9 @@ function attachSidebarEvents(navigate) {
   document.getElementById('nav-my-approved-offers')?.addEventListener('click', () => { navigate('my-approved-offers'); toggleSidebar(true); });
   document.getElementById('sidebar-open-profile')?.addEventListener('click', () => { showFirmaProfiliModal(); toggleSidebar(true); });
   document.getElementById('nav-logout')?.addEventListener('click', () => {
+    toggleSidebar(true); // Önce menüyü kapat
     sessionStorage.removeItem('firma');
     navigate('login');
-    toggleSidebar(true);
   });
 }
 
@@ -96,25 +96,23 @@ function toggleSidebar(forceClose = false) {
   const sidebar = document.querySelector('.premium-sidebar');
   const overlay = document.getElementById('sidebar-overlay');
   
-  if (!sidebar || !overlay) {
-    console.warn('Sidebar or overlay not found');
+  // Overlay her zaman kapatılabilmeli
+  if (forceClose) {
+    sidebar?.classList.remove('active');
+    overlay?.classList.remove('active');
+    document.body.style.overflow = ''; 
     return;
   }
 
-  if (forceClose) {
-    sidebar.classList.remove('active');
-    overlay.classList.remove('active');
-    document.body.style.overflow = ''; // Kaydırmayı geri aç
+  if (!sidebar || !overlay) return;
+
+  const isActive = sidebar.classList.toggle('active');
+  overlay.classList.toggle('active');
+  
+  if (isActive) {
+    document.body.style.overflow = 'hidden';
   } else {
-    const isActive = sidebar.classList.toggle('active');
-    overlay.classList.toggle('active');
-    
-    // Menü açıkken arka plan kaydırmasını engelle
-    if (isActive) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
+    document.body.style.overflow = '';
   }
 }
 
