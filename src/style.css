@@ -1271,6 +1271,19 @@ select.form-input option {
     margin-bottom: 12px;
   }
 
+  .sidebar-footer {
+    margin-top: 10px; /* En alta itmeyi bırakıp yukarı çektik */
+    padding-top: 0;
+    border-top: none;
+  }
+
+  .logout-item {
+    background: #fff1f2; /* Daha görünür olması için hafif kırmızı ton */
+    color: #e11d48;
+    border: 1px solid #fee2e2;
+    margin: 0 4px;
+  }
+
   /* Stat card padding */
   .stat-card {
     padding: 14px 12px;
