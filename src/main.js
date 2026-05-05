@@ -4,6 +4,8 @@ import { renderLoginPage, renderRegisterPage, handleLogin, handleRegister, getCu
 import { renderDashboard, attachDashboardEvents, showFirmaProfiliModal } from './dashboard.js';
 import { renderTeklifAlPage, attachTeklifAlEvents } from './teklifAl.js';
 import { renderTeklifVerPage, attachTeklifVerEvents } from './teklifVer.js';
+import { renderAcceptedOffersPage, attachAcceptedOffersEvents } from './acceptedOffers.js';
+import { renderMyApprovedOffersPage, attachMyApprovedOffersEvents } from './myApprovedOffers.js';
 import { shortId } from './utils.js';
 
 const content = document.getElementById('main-content');
@@ -16,37 +18,65 @@ function renderSidebar(activePage) {
 
   const initials = firma.firma_ismi.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
 
+  // Kategori Başlık Stilleri (Inline)
+  const baseTitleStyle = "font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.2px; padding: 6px 12px; margin-bottom: 12px; border-radius: 4px; display: inline-flex; align-items: center; border-left: 3px solid;";
+  const accountTitleStyle = baseTitleStyle + " color: #475569; background: rgba(71, 85, 105, 0.1); border-color: #475569;";
+  const operationsTitleStyle = baseTitleStyle + " color: #2563eb; background: rgba(37, 99, 235, 0.1); border-color: #2563eb;";
+  const archiveTitleStyle = baseTitleStyle + " color: #059669; background: rgba(5, 150, 105, 0.1); border-color: #059669;";
+  const sectionDivider = "margin-top: 24px; padding-top: 16px; border-top: 1px solid rgba(0,0,0,0.08);";
+
   return `
     <div class="sidebar">
       <div class="sidebar-logo">
         <span>🏢</span> TeklifSistemi
       </div>
+
+      <nav class="sidebar-nav" style="margin-bottom: 10px;">
+        <div class="nav-item ${activePage === 'dashboard' ? 'active' : ''}" id="nav-dashboard">
+          <span class="icon">📊</span> Anasayfa
+        </div>
+      </nav>
       
-      <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Hesabınız</div>
-      <div class="sidebar-profile" id="sidebar-open-profile" style="cursor: pointer; margin-bottom: 30px; padding: 12px; background: rgba(0,0,0,0.03); border-radius: var(--radius-md);">
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <div class="user-avatar" style="width: 36px; height: 36px; font-size: 0.9rem;">${initials}</div>
-          <div style="overflow: hidden;">
-            <div class="user-name" style="font-size: 0.9rem; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">${firma.firma_ismi}</div>
-            <div class="user-id" style="font-size: 0.7rem;">ID: ${shortId(firma.id)}</div>
+      <div class="sidebar-section" style="margin-top: 10px;">
+        <div style="${accountTitleStyle}">HESABINIZ</div>
+        <div class="sidebar-profile" id="sidebar-open-profile" style="cursor: pointer; padding: 12px; background: rgba(0,0,0,0.03); border-radius: var(--radius-md); margin-bottom: 8px;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div class="user-avatar" style="width: 36px; height: 36px; font-size: 0.9rem; flex-shrink: 0;">${initials}</div>
+            <div style="overflow: hidden;">
+              <div class="user-name" style="font-size: 0.85rem; font-weight: 600; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">${firma.firma_ismi}</div>
+              <div class="user-id" style="font-size: 0.7rem; color: var(--text-muted);">ID: ${shortId(firma.id)}</div>
+            </div>
           </div>
         </div>
       </div>
 
-      <nav class="sidebar-nav">
-        <div class="nav-item ${activePage === 'dashboard' ? 'active' : ''}" id="nav-dashboard">
-          <span>📊</span> Anasayfa
-        </div>
-        <div class="nav-item ${activePage === 'teklif-al' ? 'active' : ''}" id="nav-teklif-al">
-          <span>📥</span> Teklif Al
-        </div>
-        <div class="nav-item ${activePage === 'teklif-ver' ? 'active' : ''}" id="nav-teklif-ver">
-          <span>📤</span> Teklif Ver
-        </div>
-      </nav>
+      <div class="sidebar-section" style="${sectionDivider}">
+        <div style="${operationsTitleStyle}">TEKLİF İŞLEMLERİ</div>
+        <nav class="sidebar-nav">
+          <div class="nav-item ${activePage === 'teklif-al' ? 'active' : ''}" id="nav-teklif-al">
+            <span class="icon">📥</span> Teklif Al
+          </div>
+          <div class="nav-item ${activePage === 'teklif-ver' ? 'active' : ''}" id="nav-teklif-ver">
+            <span class="icon">📤</span> Teklif Ver
+          </div>
+        </nav>
+      </div>
+
+      <div class="sidebar-section" style="${sectionDivider}">
+        <div style="${archiveTitleStyle}">TAKİP & ARŞİV</div>
+        <nav class="sidebar-nav">
+          <div class="nav-item ${activePage === 'accepted-offers' ? 'active' : ''}" id="nav-accepted-offers">
+            <span class="icon">✅</span> Kabul Edilen Tekliflerim
+          </div>
+          <div class="nav-item ${activePage === 'my-approved-offers' ? 'active' : ''}" id="nav-my-approved-offers">
+            <span class="icon">📋</span> Onayladığım Teklifler
+          </div>
+        </nav>
+      </div>
+
       <div class="sidebar-footer">
         <div class="nav-item" id="nav-logout">
-          <span>🚪</span> Çıkış Yap
+          <span class="icon">🚪</span> Çıkış Yap
         </div>
       </div>
     </div>
@@ -57,6 +87,8 @@ function attachSidebarEvents(navigate) {
   document.getElementById('nav-dashboard')?.addEventListener('click', () => { navigate('dashboard'); toggleSidebar(true); });
   document.getElementById('nav-teklif-al')?.addEventListener('click', () => { navigate('teklif-al'); toggleSidebar(true); });
   document.getElementById('nav-teklif-ver')?.addEventListener('click', () => { navigate('teklif-ver'); toggleSidebar(true); });
+  document.getElementById('nav-accepted-offers')?.addEventListener('click', () => { navigate('accepted-offers'); toggleSidebar(true); });
+  document.getElementById('nav-my-approved-offers')?.addEventListener('click', () => { navigate('my-approved-offers'); toggleSidebar(true); });
   document.getElementById('sidebar-open-profile')?.addEventListener('click', () => { showFirmaProfiliModal(); toggleSidebar(true); });
   document.getElementById('nav-logout')?.addEventListener('click', () => {
     sessionStorage.removeItem('firma');
@@ -117,6 +149,14 @@ async function navigate(page) {
     case 'teklif-ver':
       mainContent.innerHTML = renderTeklifVerPage();
       attachTeklifVerEvents(navigate);
+      break;
+    case 'accepted-offers':
+      mainContent.innerHTML = renderAcceptedOffersPage();
+      attachAcceptedOffersEvents(navigate);
+      break;
+    case 'my-approved-offers':
+      mainContent.innerHTML = renderMyApprovedOffersPage();
+      attachMyApprovedOffersEvents(navigate);
       break;
     default:
       navigate('login');

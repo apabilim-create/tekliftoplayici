@@ -39,10 +39,21 @@ CREATE TABLE IF NOT EXISTS teklif_ver (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- 4. Kabul Edilen Teklifler Tablosu
+CREATE TABLE IF NOT EXISTS kabul_edilenler (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  teklif_ver_id UUID NOT NULL REFERENCES teklif_ver(id) ON DELETE CASCADE,
+  kabul_eden_firma_id UUID NOT NULL REFERENCES firma_bilgileri(id) ON DELETE CASCADE,
+  teklif_al_id UUID NOT NULL REFERENCES teklif_al(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- İndeksler
 CREATE INDEX IF NOT EXISTS idx_teklif_al_firma ON teklif_al(firma_id);
 CREATE INDEX IF NOT EXISTS idx_teklif_ver_firma ON teklif_ver(veren_firma_id);
 CREATE INDEX IF NOT EXISTS idx_teklif_ver_talep ON teklif_ver(teklif_al_id);
+CREATE INDEX IF NOT EXISTS idx_kabul_edilenler_ver ON kabul_edilenler(teklif_ver_id);
+CREATE INDEX IF NOT EXISTS idx_kabul_edilenler_eden ON kabul_edilenler(kabul_eden_firma_id);
 
 -- RLS (Row Level Security) - Opsiyonel
 -- Eğer Supabase Auth kullanılacaksa aktif edilebilir

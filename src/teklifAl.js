@@ -95,7 +95,7 @@ async function loadTalepler(navigate) {
   if (!container) return;
   try {
     const { data, error } = await supabase.from('teklif_al')
-      .select('*, teklif_ver(id, birim_fiyat, toplam_fiyat, para_birimi, notlar, urun_ismi, marka, adet, created_at, veren_firma:firma_bilgileri!teklif_ver_veren_firma_id_fkey(firma_ismi, id, mail, telefon, vergi_no))')
+      .select('*, teklif_ver(id, birim_fiyat, toplam_fiyat, para_birimi, notlar, urun_ismi, marka, adet, created_at, veren_firma:firma_bilgileri!teklif_ver_veren_firma_id_fkey(firma_ismi, id, mail, telefon, vergi_no), kabul_edilenler(id))')
       .eq('firma_id', firma.id).order('created_at', { ascending: false });
     if (error) throw error;
     if (!data || data.length === 0) {
@@ -115,6 +115,21 @@ async function loadTalepler(navigate) {
         finally { setLoading(false); }
       });
     });
+
+    container.querySelectorAll('.accept-teklif-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const teklifId = btn.dataset.teklifId;
+        const talepId = btn.dataset.talepId;
+        await handleAcceptOffer(teklifId, talepId, navigate);
+      });
+    });
+
+    container.querySelectorAll('.undo-accept-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const teklifId = btn.dataset.teklifId;
+        await handleUndoAcceptOffer(teklifId, navigate);
+      });
+    });
   } catch (err) {
     container.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><h3>Yüklenemedi</h3><p>' + err.message + '</p></div>';
   }
@@ -127,7 +142,9 @@ function renderTalepCard(talep) {
     // Fiyata göre sırala (Ucuzdan pahalıya)
     teklifler.sort((a, b) => a.birim_fiyat - b.birim_fiyat);
 
-    const rows = teklifler.map(t => `<tr>
+    const rows = teklifler.map(t => {
+      const isAccepted = t.kabul_edilenler && t.kabul_edilenler.length > 0;
+      return `<tr>
       <td style="font-weight:600;">
         ${t.veren_firma?.firma_ismi || '—'}<br>
         <small class="text-muted">VKN: ${t.veren_firma?.vergi_no || '—'}</small>
@@ -139,9 +156,20 @@ function renderTalepCard(talep) {
       <td>${t.urun_ismi || '—'}</td><td>${t.marka || '—'}</td><td>${t.adet || '—'}</td>
       <td style="color:var(--accent-secondary);font-weight:600;">${formatMoney(t.birim_fiyat, t.para_birimi)}</td>
       <td style="color:var(--accent-primary);font-weight:600;">${formatMoney(t.toplam_fiyat, t.para_birimi)}</td>
-      <td>${t.notlar || '—'}</td></tr>`).join('');
+      <td>${t.notlar || '—'}</td>
+      <td>
+        ${isAccepted 
+          ? `
+            <div style="display:flex; flex-direction:column; gap:4px;">
+              <span class="badge badge-completed">✅ Kabul Edildi</span>
+              <button class="btn btn-secondary btn-sm undo-accept-btn" data-teklif-id="${t.id}" style="font-size:0.7rem; padding:4px 8px;">↩️ Vazgeç</button>
+            </div>` 
+          : `<button class="btn btn-primary btn-sm accept-teklif-btn" data-teklif-id="${t.id}" data-talep-id="${talep.id}">✔️ Kabul Et</button>`}
+      </td>
+      </tr>`;
+    }).join('');
     teklifHtml = `<div style="margin-top:12px;"><p style="font-size:0.85rem;color:var(--accent-secondary);font-weight:600;margin-bottom:8px;">📬 ${teklifler.length} teklif geldi</p>
-      <div class="table-wrapper"><table class="data-table"><thead><tr><th>Firma</th><th>İletişim</th><th>Ürün</th><th>Marka</th><th>Adet</th><th>Birim Fiyat</th><th>Toplam</th><th>Not</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+      <div class="table-wrapper"><table class="data-table"><thead><tr><th>Firma</th><th>İletişim</th><th>Ürün</th><th>Marka</th><th>Adet</th><th>Birim Fiyat</th><th>Toplam</th><th>Not</th><th>İşlem</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
   }
   return `<div class="glass-card glass-card-wide" style="margin-bottom:16px;">
     <div class="flex-between" style="margin-bottom:12px;flex-wrap:wrap;gap:8px;">
@@ -150,4 +178,63 @@ function renderTalepCard(talep) {
         <p class="text-muted" style="font-size:0.85rem;margin-top:4px;">Marka: ${talep.marka || '—'} · Adet: ${talep.adet || '—'} · Son Tarih: ${formatDate(talep.son_teklif_tarihi)}</p></div>
       <button class="btn btn-secondary btn-sm delete-talep-btn" data-id="${talep.id}">🗑️ Sil</button>
     </div>${teklifHtml}</div>`;
+}
+
+async function handleAcceptOffer(teklifId, talepId, navigate) {
+  if (!confirm('Bu teklifi kabul etmek istediğinize emin misiniz?')) return;
+  
+  const firma = getCurrentFirma();
+  setLoading(true);
+  
+  try {
+    // 1. Karşı tarafın görmesi için kabul_edilenler tablosuna kaydet
+    const { error: error1 } = await supabase.from('kabul_edilenler').insert([{
+      teklif_ver_id: teklifId,
+      kabul_eden_firma_id: firma.id,
+      teklif_al_id: talepId
+    }]);
+
+    if (error1) throw error1;
+
+    // 2. Kendi menümüzde görmemiz için onayladigim_teklifler tablosuna kaydet
+    const { error: error2 } = await supabase.from('onayladigim_teklifler').insert([{
+      teklif_ver_id: teklifId,
+      onaylayan_firma_id: firma.id,
+      teklif_al_id: talepId
+    }]);
+
+    if (error2) throw error2;
+
+    showToast('Teklif kabul edildi ve onaylandı!', 'success');
+    await loadTalepler(navigate);
+  } catch (err) {
+    console.error('Accept offer error:', err);
+    showToast('Hata: ' + err.message, 'error');
+  } finally {
+    setLoading(false);
+  }
+}
+
+async function handleUndoAcceptOffer(teklifId, navigate) {
+  if (!confirm('Onayı geri almak istediğinize emin misiniz?')) return;
+  
+  setLoading(true);
+  try {
+    // Her iki tablodan da kaydı sil
+    const [res1, res2] = await Promise.all([
+      supabase.from('kabul_edilenler').delete().eq('teklif_ver_id', teklifId),
+      supabase.from('onayladigim_teklifler').delete().eq('teklif_ver_id', teklifId)
+    ]);
+
+    if (res1.error) throw res1.error;
+    if (res2.error) throw res2.error;
+
+    showToast('İşlem geri alındı', 'info');
+    await loadTalepler(navigate);
+  } catch (err) {
+    console.error('Undo accept error:', err);
+    showToast('Hata: ' + err.message, 'error');
+  } finally {
+    setLoading(false);
+  }
 }
