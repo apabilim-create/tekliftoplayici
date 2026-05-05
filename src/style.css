@@ -1119,6 +1119,7 @@ select.form-input option {
     position: fixed !important;
     top: 0;
     left: 0;
+    height: 100dvh; /* Dynamic Viewport Height */
     height: 100vh;
     width: 300px;
     max-width: 85vw;
@@ -1127,6 +1128,11 @@ select.form-input option {
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 20px 0 50px rgba(0,0,0,0.15);
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch; /* iOS için pürüzsüz kaydırma */
+    overscroll-behavior: contain; /* Arka sayfanın kaymasını engeller */
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 40px; /* Alt kısımdaki butonların kesilmemesi için */
   }
 
   .premium-sidebar.active {
