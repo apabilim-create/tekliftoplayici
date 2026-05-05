@@ -39,7 +39,7 @@ function renderSidebar(activePage) {
           <div class="profile-avatar">${initials}</div>
           <div class="profile-info">
             <div class="profile-name">${firma.firma_ismi}</div>
-            <div class="profile-id">ID: ${shortId(firma.id)}</div>
+            <div class="profile-id">VKN: ${firma.vergi_no || 'Belirtilmedi'}</div>
           </div>
           <div class="profile-chevron">›</div>
         </div>
