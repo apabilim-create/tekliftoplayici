@@ -55,6 +55,59 @@ body {
   min-height: 100vh;
 }
 
+/* --- Mobile Header --- */
+.mobile-header {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--glass-border);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  box-shadow: var(--shadow-glow);
+}
+
+.menu-toggle {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--accent-primary);
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+}
+
+.menu-toggle:hover {
+  background: var(--glass-bg-hover);
+}
+
+.mobile-logo {
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: var(--accent-primary);
+}
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px);
+  z-index: 15;
+  animation: fadeIn 0.2s ease;
+}
+
+.sidebar-overlay.active {
+  display: block;
+}
+
 /* --- Animated Background --- */
 .bg-animation {
   display: none;
@@ -85,7 +138,8 @@ body {
   padding: 32px 20px;
   position: fixed;
   height: 100vh;
-  z-index: 10;
+  z-index: 20;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .sidebar-logo {
@@ -896,40 +950,90 @@ select.form-input option {
 
 /* --- Responsive --- */
 @media (max-width: 768px) {
+  .mobile-header {
+    display: flex;
+  }
+
+  .sidebar {
+    transform: translateX(-100%);
+    box-shadow: 20px 0 50px rgba(0,0,0,0.1);
+  }
+
+  .sidebar.active {
+    transform: translateX(0);
+  }
+
+  .with-sidebar #main-content {
+    margin-left: 0;
+  }
+
+  #main-content {
+    padding: 24px 16px;
+  }
+
   .glass-card {
-    padding: 28px 20px;
-    margin: 10px;
+    padding: 24px 16px;
+    margin: 0;
+    max-width: 100%;
+    border-radius: var(--radius-lg);
   }
 
   .action-grid {
     grid-template-columns: 1fr;
+    gap: 12px;
   }
 
   .form-row {
     grid-template-columns: 1fr;
+    gap: 12px;
   }
 
   .dashboard-header {
     flex-direction: column;
     align-items: flex-start;
+    margin-bottom: 24px;
   }
 
   .stats-grid {
     grid-template-columns: 1fr 1fr;
+    gap: 12px;
   }
 
   .teklif-inline-form {
     grid-template-columns: 1fr;
+    padding: 12px;
   }
 
   .data-table {
-    min-width: 500px;
+    min-width: 600px;
+  }
+
+  .table-wrapper {
+    margin-left: -4px;
+    margin-right: -4px;
+  }
+
+  .modal-content {
+    padding: 20px 16px;
+    margin: 10px;
   }
 }
 
 @media (max-width: 480px) {
   .stats-grid {
     grid-template-columns: 1fr;
+  }
+  
+  .app-logo h1 {
+    font-size: 1.5rem;
+  }
+
+  .btn {
+    width: 100%;
+  }
+
+  .section-header h2 {
+    font-size: 1.2rem;
   }
 }
 

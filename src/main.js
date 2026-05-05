@@ -54,14 +54,29 @@ function renderSidebar(activePage) {
 }
 
 function attachSidebarEvents(navigate) {
-  document.getElementById('nav-dashboard')?.addEventListener('click', () => navigate('dashboard'));
-  document.getElementById('nav-teklif-al')?.addEventListener('click', () => navigate('teklif-al'));
-  document.getElementById('nav-teklif-ver')?.addEventListener('click', () => navigate('teklif-ver'));
-  document.getElementById('sidebar-open-profile')?.addEventListener('click', showFirmaProfiliModal);
+  document.getElementById('nav-dashboard')?.addEventListener('click', () => { navigate('dashboard'); toggleSidebar(true); });
+  document.getElementById('nav-teklif-al')?.addEventListener('click', () => { navigate('teklif-al'); toggleSidebar(true); });
+  document.getElementById('nav-teklif-ver')?.addEventListener('click', () => { navigate('teklif-ver'); toggleSidebar(true); });
+  document.getElementById('sidebar-open-profile')?.addEventListener('click', () => { showFirmaProfiliModal(); toggleSidebar(true); });
   document.getElementById('nav-logout')?.addEventListener('click', () => {
     sessionStorage.removeItem('firma');
     navigate('login');
+    toggleSidebar(true);
   });
+}
+
+function toggleSidebar(forceClose = false) {
+  const sidebar = document.querySelector('.sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  if (!sidebar || !overlay) return;
+
+  if (forceClose) {
+    sidebar.classList.remove('active');
+    overlay.classList.remove('active');
+  } else {
+    sidebar.classList.toggle('active');
+    overlay.classList.toggle('active');
+  }
 }
 
 async function navigate(page) {
@@ -112,6 +127,10 @@ async function navigate(page) {
     e.preventDefault();
     navigate('dashboard');
   });
+
+  // Mobile menu toggle
+  document.getElementById('menu-toggle')?.addEventListener('click', () => toggleSidebar());
+  document.getElementById('sidebar-overlay')?.addEventListener('click', () => toggleSidebar(true));
 }
 
 // Uygulama başlat
