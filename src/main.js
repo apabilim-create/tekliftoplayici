@@ -93,7 +93,7 @@ function attachSidebarEvents(navigate) {
 }
 
 function toggleSidebar(forceClose = false) {
-  const sidebar = document.querySelector('.sidebar');
+  const sidebar = document.querySelector('.premium-sidebar');
   const overlay = document.getElementById('sidebar-overlay');
   if (!sidebar || !overlay) return;
 
