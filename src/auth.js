@@ -35,8 +35,8 @@ export function renderRegisterPage() {
 
         <div class="form-row">
           <div class="form-group">
-            <label>Vergi Kimlik No</label>
-            <input type="text" class="form-input" id="reg-vergi" placeholder="Vergi kimlik no">
+            <label>Vergi Kimlik No <span class="required">*</span></label>
+            <input type="text" class="form-input" id="reg-vergi" placeholder="Vergi kimlik no" required>
           </div>
           <div class="form-group">
             <label>Şifre <span class="required">*</span></label>
@@ -103,8 +103,8 @@ export async function handleRegister(e, navigate) {
   const vergi = document.getElementById('reg-vergi').value.trim();
   const sifre = document.getElementById('reg-sifre').value;
 
-  if (!firma || !mail || !sifre) {
-    showToast('Lütfen zorunlu alanları doldurun', 'error');
+  if (!firma || !mail || !sifre || !vergi) {
+    showToast('Lütfen tüm zorunlu alanları doldurun', 'error');
     return;
   }
 
