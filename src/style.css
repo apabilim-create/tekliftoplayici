@@ -1119,7 +1119,7 @@ select.form-input option {
     position: fixed !important;
     top: 0;
     left: 0;
-    height: 100dvh; /* Dynamic Viewport Height */
+    height: 100dvh;
     height: 100vh;
     width: 300px;
     max-width: 85vw;
@@ -1128,11 +1128,11 @@ select.form-input option {
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 20px 0 50px rgba(0,0,0,0.15);
     overflow-y: auto;
-    -webkit-overflow-scrolling: touch; /* iOS için pürüzsüz kaydırma */
-    overscroll-behavior: contain; /* Arka sayfanın kaymasını engeller */
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
     display: flex;
     flex-direction: column;
-    padding-bottom: 40px; /* Alt kısımdaki butonların kesilmemesi için */
+    padding: 20px 14px 40px; /* Üst ve yan paddingler azaltıldı */
   }
 
   .premium-sidebar.active {
@@ -1238,15 +1238,37 @@ select.form-input option {
     margin-bottom: 16px;
   }
 
-  /* Nav item hover efekti mobilde off */
+  /* Nav item hover efekti mobilde off ve sıkıştırma */
+  .nav-item {
+    padding: 10px 12px;
+    gap: 10px;
+  }
+
   .nav-item:hover {
     transform: none;
   }
 
+  .sidebar-logo {
+    margin-bottom: 20px; /* Başlık boşluğu daraltıldı */
+  }
+
+  .sidebar-main-nav {
+    margin-bottom: 12px; /* Anasayfa ve Hesabınız arası boşluk daraltıldı */
+  }
+
+  .sidebar-category-label {
+    margin-bottom: 10px;
+  }
+
+  .sidebar-profile-card {
+    padding: 10px;
+    border-radius: 12px;
+  }
+
   /* Sidebar section padding daralt */
   .sidebar-section {
-    padding: 12px 10px;
-    margin-bottom: 14px;
+    padding: 10px 8px;
+    margin-bottom: 12px;
   }
 
   /* Stat card padding */
